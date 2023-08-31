@@ -9,6 +9,7 @@ from unyt import c, h, nJy, erg, s, Hz, pc, angstrom, eV, unyt_array
 from .units import Quantity
 from .igm import Inoue14
 from . import exceptions
+from .utils import rebin_1d
 
 
 def uv_indices():
@@ -368,6 +369,26 @@ class Sed:
         )
 
         return ew
+     
+    def get_rebinned_sed(self, n):
+        """
+        Rebin the spectra and create a new Sed object
+
+        Parameters
+        ----------
+        n: int 
+            
+        Returns
+        ----------
+        object (Sed)
+            new instance of Sed
+
+        """
+
+        return Sed(rebin_1d(self.lam, n, func='mean'), rebin_1d(self.lnu, n, func='sum'))
+
+
+
 
     # def return_log10Q(self):
     #     """
