@@ -195,3 +195,34 @@ def planck(nu, T):
     """
 
     return (2.0 * h * (nu**3) * (c**-2)) * (1.0 / (np.exp(h * nu / (kb * T)) - 1.0))
+
+
+def rebin_1d(a, i, func=np.sum):
+
+    """
+    A simple function for rebinning a 1D array using a specificed
+    function (e.g. sum or mean).
+    
+    Parameters
+    ----------
+    a : array
+        the input 1D array
+    i : int
+        integer rebinning factor, i.e. how many bins to rebin by
+    func : func
+        the function to use (e.g. mean or sum)
+    """
+
+    # add exeption to make sure a is an 1D array
+
+    # add exeption to make sure n is an integer
+    
+    n = len(a)
+
+    # if array is not the right size truncate it
+    if n % i != 0:
+        a = a[:int(i * np.floor(n/i))]
+
+    x = len(a) // i
+    b = a.reshape(x, i)
+    return func(b, axis=1)
