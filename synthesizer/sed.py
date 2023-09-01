@@ -385,7 +385,7 @@ class Sed:
 
         """
 
-        return Sed(rebin_1d(self.lam, n, func='mean'), rebin_1d(self.lnu, n, func='sum'))
+        return Sed(rebin_1d(self.lam, n, func=np.mean), rebin_1d(self.lnu, n, func=np.sum))
 
 
 
