@@ -868,7 +868,7 @@ class BaseGalaxy:
             dust_curve_stellar=dust_curve,
         )
 
-    def get_equivalent_width(self, feature, blue, red, spectra_to_plot=None):
+    def get_equivalent_width(self, feature, blue, red, n, spectra_to_plot=None):
         """
         Gets all equivalent widths associated with a sed object
 
@@ -894,7 +894,7 @@ class BaseGalaxy:
             sed = self.spectra[sed_name]
 
             # Compute equivalent width
-            equivalent_width = sed.measure_index(feature, blue, red)
+            equivalent_width = sed.measure_index(feature, blue, red, n)
 
         return equivalent_width
 

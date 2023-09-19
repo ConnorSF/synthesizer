@@ -304,7 +304,6 @@ class Sed:
                     for _lnu in self._lnu]) * units.lnu
                 
             else:
-
                 lnu = self.lnu[::-1]
                 Lnu = np.trapz(lnu * transmission[::-1] / nu, x=nu) / \
                     np.trapz(transmission[::-1]/nu, x=nu)
@@ -591,7 +590,7 @@ class Sed:
         return 2.5 * np.log10(self.broadband_fluxes[f2] /
                               self.broadband_fluxes[f1])
 
-    def measure_index(self, feature, blue, red):
+    def measure_index(self, feature, blue, red, n):
 
         """
         Measure an asorption feature index.
@@ -638,12 +637,15 @@ class Sed:
 
                 # define the continuum subtracted spectrum
                 feature_lum = _lnu[transmission]
+
                 feature_lum_continuum_subtracted = -(feature_lum - continuum)\
                     / continuum
 
+                nl, nf = rebin(feature_lam,
+                    feature_lum_continuum_subtracted, n)
+
                 # measure index
-                index[i] = np.trapz(feature_lum_continuum_subtracted,
-                                    x=feature_lam)
+                index[i] = np.trapz(nf, x=nl)
 
         else:
 
@@ -661,7 +663,9 @@ class Sed:
                 continuum
 
             # measure index
-            index = np.trapz(feature_lum_continuum_subtracted, x=feature_lam)
+            nl, nf = rebin(feature_lam, feature_lum_continuum_subtracted, n)
+
+            index = np.trapz(nf, x=nl)
 
         return index
 
@@ -742,11 +746,19 @@ def calculate_Q(lam, lnu, ionisation_energy=13.6 * eV, limit=100):
 
     
 
-# def rebin(l, f, n):  # rebin SED [currently destroys original]
-#     n_len = int(np.floor(len(l) / n))
-#     _l = l[: n_len * n]
-#     _f = f[: n_len * n]
-#     nl = np.mean(_l.reshape(n_len, n), axis=1)
-#     nf = np.sum(_f.reshape(n_len, n), axis=1) / n
+def rebin(l, f, factor):  # rebin SED [currently destroys original]
+    downsample = int(round(factor))
+    # Define the new wavelength grid (desired resolution)
+    nl = np.linspace(min(l), max(l), len(l)//downsample)  # New wavelength grid with fewer points
 
-#     return nl, nf
+    # Perform spline interpolation
+    interpolator = interp1d(l, f, kind='cubic')
+    nf = interpolator(nl)
+
+    # Apply a weighted average for non-integer factor
+    remainder = factor - downsample
+    weighted_average = (
+        (1 - remainder) * nf + (remainder * nf)
+    )
+
+    return nl, weighted_average

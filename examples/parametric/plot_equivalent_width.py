@@ -39,7 +39,7 @@ def set_index():
     return index, index_window, blue_window, red_window
 
 
-def get_ew(index, feature, blue, red, Z, smass, grid, EqW, mode):
+def get_ew(index, feature, blue, red, Z, smass, grid, EqW, mode, n):
     """
     Calculate equivalent width for a specified UV index.
 
@@ -50,6 +50,7 @@ def get_ew(index, feature, blue, red, Z, smass, grid, EqW, mode):
         grid (Grid): The grid object.
         EqW (float): Initial equivalent width.
         mode (str): Calculation mode.
+        n (int): resolution downsample factor
 
     Returns:
         float: The calculated equivalent width.
@@ -83,7 +84,7 @@ def get_ew(index, feature, blue, red, Z, smass, grid, EqW, mode):
     else:
         galaxy.get_spectra_intrinsic(grid, fesc=0.5)
 
-    EqW.append(galaxy.get_equivalent_width(feature, blue, red))
+    EqW.append(galaxy.get_equivalent_width(feature, blue, red, n))
     return EqW
 
 
@@ -109,13 +110,14 @@ def equivalent_width(grids, uv_index, index_window, blue_window, red_window):
         # --- define the parameters of the star formation and metal enrichment histories
         Z = grid.metallicity
         stellar_mass = 1e8
+        n = 1.59
         EqW = []
 
         # Compute each index for each metallicity in the grid.
         feature, blue, red = index_window[i], blue_window[i], red_window[i]
 
         for k in range(0, len(Z)):
-            EqW = get_ew(index, feature, blue, red, Z[k], stellar_mass, grid, EqW, 0)
+            EqW = get_ew(index, feature, blue, red, Z[k], stellar_mass, grid, EqW, 0, n)
 
         print(EqW)
 
