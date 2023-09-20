@@ -162,7 +162,6 @@ def equivalent_width(grids, uv_index, index_window, blue_window, red_window):
 if __name__ == "__main__":
     grid_dir = "../../tests/test_grid"  # Change this directory to your own.
     grid_name = "test_grid"  # Change this to the appropriate .hdf5
-
     index, index_window, blue_window, red_window = set_index()  # Retrieve UV indices
 
     equivalent_width(grid_name, index, index_window, blue_window, red_window)

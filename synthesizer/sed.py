@@ -591,7 +591,6 @@ class Sed:
                               self.broadband_fluxes[f1])
 
     def measure_index(self, feature, blue, red, n):
-
         """
         Measure an asorption feature index.
 
@@ -614,8 +613,12 @@ class Sed:
 
         # define the wavelength grid over the feature
         transmission = (self.lam > feature[0]) & (self.lam < feature[1])
-        feature_lam = self.lam[transmission]
 
+        if any(transmission) and (not np.isnan(lnu_blue)) and (not np.isnan(lnu_red)):
+           feature_lam = self.lam[transmission]
+        else:
+           print('Grid resolution insufficient. No values in spectral bins')
+           return float(0)
         # using the red and blue windows fit the continuum
         # note, this does not conserve units so we need to add them back in
         # later.
@@ -637,9 +640,7 @@ class Sed:
 
                 # define the continuum subtracted spectrum
                 feature_lum = _lnu[transmission]
-
-                feature_lum_continuum_subtracted = -(feature_lum - continuum)\
-                    / continuum
+                feature_lum_continuum_subtracted = -(feature_lum - continuum) / continuum
 
                 nl, nf = rebin(feature_lam,
                     feature_lum_continuum_subtracted, n)
@@ -655,12 +656,13 @@ class Sed:
             # use the continuum fit to define the continuum
             continuum = ((continuum_fit[0] * feature_lam.to(units.lam).value)
                          + continuum_fit[1]) * units.lnu
-
-            # define the continuum subtracted spectrum
+             # define the continuum subtracted spectrum
             feature_lum = self.lnu[transmission]
 
-            feature_lum_continuum_subtracted = -(feature_lum - continuum) / \
-                continuum
+            feature_lum_continuum_subtracted = -(feature_lum - continuum) / continuum
+
+            nl, nf = rebin(feature_lam,
+                feature_lum_continuum_subtracted, n)
 
             # measure index
             nl, nf = rebin(feature_lam, feature_lum_continuum_subtracted, n)
